@@ -1,8 +1,12 @@
 var root = {};
 
-function register(channel, callback) {
+function ChannelRegistar() {
+	this.root = {};
+}
+
+ChannelRegistar.prototype.register = function (channel, callback) {
 	var tokens = channel.split('.');
-	var currentNode = root;
+	var currentNode = this.root;
 	var length = tokens.length - 1;
 	for (var i = 0; i <= length; i++) {
 		var token = tokens[i];
@@ -12,9 +16,9 @@ function register(channel, callback) {
 	}
 }
 
-function remove(channel) {
+ChannelRegistar.prototype.remove = function (channel) {
 	var tokens = channel.split('.');
-	var currentNode = root;
+	var currentNode = this.root;
 	var length = tokens.length - 1;
 	for (var i = 0; i <= length; i++) {
 		var token = tokens[i];
@@ -31,10 +35,10 @@ function remove(channel) {
 			currentNode = currentNode[token];
 		}
 	}
-	//cleanup();
+	cleanup(this.root);
 }
 
-function cleanup() {
+function cleanup(root) {
 	var currentNode = root;
 	dfsCleanUp(root, function(parentNode, childNodeName) {
 		 delete parentNode[childNodeName];
@@ -53,9 +57,9 @@ function dfs(node, onLeafFound, onNodeTouch) {
 	}
 }
 
-function count() {
+ChannelRegistar.prototype.count = function () {
 	var count = 0;
-	dfs(root, null, function(parentNode, childNodeName) {
+	dfs(this.root, null, function(parentNode, childNodeName) {
 		count++;
 	});
 	return count;
@@ -65,9 +69,9 @@ function isNodeEmpty(node) {
 	return Object.keys(node).length === 0;
 }
 
-function search(channel) {
+ChannelRegistar.prototype.search = function (channel) {
 	var tokens = channel.split('.');
-	var currentNode = root;
+	var currentNode = this.root;
 	var callbacks = [];
 	var length = tokens.length - 1;
 	for (var i = 0; i <= length; i++) {
@@ -84,14 +88,8 @@ function search(channel) {
 	return callbacks;
 }
 
-function clear() {
-	root = {};
+ChannelRegistar.prototype.clear = function () {
+	this.root = {};
 }
 
-module.exports = {
-	register	:	register,
-	remove		:	remove,
-	search		:	search,
-	clear		:	clear,
-	count		:	count
-}
+module.exports = ChannelRegistar;

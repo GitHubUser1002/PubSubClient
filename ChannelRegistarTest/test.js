@@ -5,7 +5,8 @@ describe('ChannelRegistar', function() {
 	var init = null;
 
 	before(function() {	
-		ChannelRegistar = require(__dirname+'/../ChannelRegistar');
+		var ChannelRegistarClass = require(__dirname+'/../ChannelRegistar');
+		ChannelRegistar = new ChannelRegistarClass();
 	});
 	
 	beforeEach(function() {

@@ -7,7 +7,7 @@ describe('PubSubClient', function() {
 	var init = null;
 
 	before(function() {
-		var config = require(__dirname+'/../config');
+		var config = require(__dirname+'/../../Config');
 		var redis = require('redis');
 		
 		pubsubclient = require(__dirname+'/../PubSubClient');
@@ -21,7 +21,7 @@ describe('PubSubClient', function() {
 	});
 	
 	beforeEach(function() {
-		
+		pubsubclient.reset();
 	});
 
 	describe('#subscribe()', function () {
@@ -42,15 +42,7 @@ describe('PubSubClient', function() {
 		it('Receives a message on the specified channel and subject', function (done) {
 			var callback = function() {
 				var count = 0
-				pubsubclient.subscribe('channel', function(msg) {
-					assert.equal(msg.content, 'message');
-					
-					if (++count === 2) {
-						pubsubclient.unsubscribe('channel');
-						done();
-					}
-				}, 'subject');
-				pubsubclient.subscribe('channel', function(msg) {
+				pubsubclient.subscribe('channel.*', function(msg) {
 					assert.equal(msg.content, 'message');
 					
 					if (++count === 2) {
@@ -58,42 +50,51 @@ describe('PubSubClient', function() {
 						done();
 					}
 				});
-				pubsubclient.publish('channel', 'id', 'message', 'subject');
+				pubsubclient.subscribe('channel.subject', function(msg) {
+					assert.equal(msg.content, 'message');
+					
+					if (++count === 2) {
+						pubsubclient.unsubscribe('channel');
+						done();
+					}
+				});
+				pubsubclient.publish('channel.subject', 'id', 'message');
 			};
 			init(callback);
 		});
 	});	
-	
+
 	describe('#unsubscribe()', function () {
 		it('Stops a subscription', function (done) {
 			var callback = function() {
 				var count = 0
 				var unsubscribed = false; 
-				pubsubclient.subscribe('channel', function(msg) {
+				pubsubclient.subscribe('channel.subject', function(msg) {
 					assert.equal(msg.content, 'message');
 					
-					pubsubclient.unsubscribe('channel', 'subject');
+					pubsubclient.unsubscribe('channel.subject');
 					
 					if (unsubscribed) {
 						assert.equal(false, true);
 					}
 					else { 
 						unsubscribed = true;
-						pubsubclient.publish('channel', 'id', 'message', 'subject');
+						pubsubclient.publish('channel.subject', 'id', 'message');
 					}
 					
-				}, 'subject');
-				pubsubclient.subscribe('channel', function(msg) {
+				});
+				pubsubclient.subscribe('channel.*', function(msg) {
 					assert.equal(msg.content, 'message');
-					
+
 					if (++count === 2) {
-						pubsubclient.unsubscribe('channel');
+						//pubsubclient.unsubscribe('channel.*');
 						done();
 					}
 				});
-				pubsubclient.publish('channel', 'id', 'message', 'subject');
+				pubsubclient.publish('channel.subject', 'id', 'message');
 			};
 			init(callback);
 		});
 	});	
+
 });

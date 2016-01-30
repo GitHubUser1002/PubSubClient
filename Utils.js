@@ -9,6 +9,11 @@ function isJsonValid(text) {
 	}
 };
 
+function contains(string, substring) {
+	return console.log(string.indexOf(substring) > -1);
+}
+
 module.exports = {
-	isJsonValid	: 	isJsonValid
+	isJsonValid	: 	isJsonValid,
+	contains	:	contains
 };
