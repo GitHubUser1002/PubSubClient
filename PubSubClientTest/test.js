@@ -1,7 +1,7 @@
 var assert = require('assert');
 var pubsubclient = null;
 
-pubsubclient = require(__dirname+'/../PubSubClient');
+var pubsubclientclass = require(__dirname+'/../PubSubClient');
 
 describe('PubSubClient', function() {	
 	var init = null;
@@ -9,11 +9,9 @@ describe('PubSubClient', function() {
 	before(function() {
 		var config = require(__dirname+'/../../Config');
 		var redis = require('redis');
-		
-		pubsubclient = require(__dirname+'/../PubSubClient');
-		
+
 		init = function(callback) {
-			pubsubclient.init(redis, config, function() {
+			pubsubclient = new pubsubclientclass(redis, config, function() {
 				callback();
 			});
 		};
@@ -21,7 +19,7 @@ describe('PubSubClient', function() {
 	});
 	
 	beforeEach(function() {
-		pubsubclient.reset();
+		if (pubsubclient) pubsubclient.reset();
 	});
 
 	describe('#subscribe()', function () {
