@@ -61,6 +61,26 @@ describe('PubSubClient', function() {
 			init(callback);
 		});
 	});	
+	
+	describe('#pusblish()', function () {
+		it('Sends a burst of messages', function (done) {
+			var callback = function() {
+				var count = 0
+				pubsubclient.subscribe('channel.*', function(msg) {
+					assert.equal(msg.content, 'message');
+					
+					if (++count === 100) {
+						pubsubclient.unsubscribe('channel');
+						done();
+					}
+				});
+				setInterval(function() {
+					if (count < 100) pubsubclient.publish('channel.subject', 'id', 'message');
+				}, 1);
+			};
+			init(callback);
+		});
+	});	
 
 	describe('#unsubscribe()', function () {
 		it('Stops a subscription', function (done) {
